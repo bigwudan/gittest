@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include "http.h"
 #define BUFFER_SIZE 1024
 
-int main()
+
+void handle_connect()
 {
 	char *pResult = NULL;
 	char host_addr[BUFFER_SIZE] = {'\0'};
@@ -29,6 +32,20 @@ int main()
 	flag = http_tcpclient_send(socket_fd, pResult);
 	flag = http_tcpclient_recv(socket_fd, lpbuf1);
 	printf("lpbuf1=%s\n", lpbuf1);
+}
+
+
+int main()
+{
+	pid_t pid[2];
+	int i = 0 ;
+	for(i = 0; i<2; i++){
+		pid[i] = fork();
+		if(pid[i] == 0){
+			handle_connect();
+		}
+	}
+
 
 	return 1;
 }
