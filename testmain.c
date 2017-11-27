@@ -6,8 +6,7 @@
 #include "http.h"
 #define BUFFER_SIZE 1024
 
-
-void handle_connect()
+void handle_connect(varNum)
 {
 	char *pResult = NULL;
 	char host_addr[BUFFER_SIZE] = {'\0'};
@@ -27,25 +26,89 @@ void handle_connect()
 	flag = http_tcpclient_send(socket_fd, pResult);
 	flag = http_tcpclient_recv(socket_fd, lpbuf);
 	http_parse_content(lpbuf, &vals_message_type, &cookesNum, &pHttpContent);
-
 	flag = http_get_send_content(&pResult, "/group/v226/detail.html?do=ShowLogin", vals_message_type, cookesNum);
 	flag = http_tcpclient_send(socket_fd, pResult);
 	flag = http_tcpclient_recv(socket_fd, lpbuf1);
-	printf("lpbuf1=%s\n", lpbuf1);
+	printf("varNum=%d\n", varNum);
+	close(socket_fd);
+	// printf("lpbuf1=%s\n", lpbuf1);
 }
 
+int readFile()
+{
+	FILE *pFile = NULL;
+	char *pChar = NULL;
+	char *pStr = NULL;
+	char uidList[10]; 
+	int num = 0; 
+	int count = 0;
+	int uids[4000];
+	pFile = fopen("uidconfig.txt", "r");
+	if(pFile == NULL){
+		return -1;
+	}else{
+
+		while(fgets(uidList, sizeof(uidList), pFile) != NULL){
+			
+			pChar = strchr(uidList, ',');
+			num = pChar - uidList;
+			pStr = (char *)malloc(sizeof(char)*num);
+			strncpy(pStr, uidList, num);
+			num = atoi(pStr);
+			uids[count] = num;
+			printf("uids[]=%d\n", uids[count]);
+			free(pStr);
+			pStr = NULL;
+			count++;
+		}
+		// char *pTemp = NULL;
+		// pTemp = fgets(uidList, sizeof(uidList), pFile);
+
+		// int yom = strlen(pTemp);
+
+		// printf("yom=%d\n", yom);
+		// printf("uid=%s\n", uidList);
+		// fgets(uidList, sizeof(uidList), pFile);
+
+		// printf("uid=%s\n", uidList);
+		// fgets(uidList, sizeof(uidList), pFile);
+		// printf("uid=%s\n", uidList);
+		// fgets(uidList, sizeof(uidList), pFile);
+		// printf("uid=%s\n", uidList);
+		
+
+		// pTemp = fgets(uidList, sizeof(uidList), pFile);
+
+		
+		// // int tmp = feof(pFile);
+		// pTemp = fgets(uidList, sizeof(uidList), pFile);
+		// printf("tmp1=%s\n", pTemp);
+		
+	}
+	fclose(pFile);
+	return 0;
+
+}
 
 int main()
 {
-	pid_t pid[2];
-	int i = 0 ;
-	for(i = 0; i<2; i++){
+	readFile();
+	return 0;
+	int totNum = 3;
+	pid_t pid[totNum];
+	int i = 0;
+	for (i = 0; i < totNum; i++)
+	{
 		pid[i] = fork();
-		if(pid[i] == 0){
-			handle_connect();
+		if (pid[i] == 0)
+		{
+			handle_connect(i);
+		}
+		else
+		{
+			break;
 		}
 	}
-
 
 	return 1;
 }
