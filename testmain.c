@@ -5,8 +5,9 @@
 #include <unistd.h>
 #include "http.h"
 #define BUFFER_SIZE 1024
+#define UID_NUM 2
 
-void handle_connect(varNum)
+int handle_connect(varNum)
 {
 	char *pResult = NULL;
 	char host_addr[BUFFER_SIZE] = {'\0'};
@@ -20,21 +21,27 @@ void handle_connect(varNum)
 	int socket_fd = -1;
 	int flag = -1;
 	int cookesNum = 0;
+	char *urlTemplet = "http://wap.dev.epet.com/group/v226/detail.html?do=Login&uid=";
+	char numCtr[10] = {'\0'};
+	sprintf(numCtr, "%d", varNum);
+	char *urlStr = NULL;
+	urlStr = (char *)calloc((strlen(urlTemplet)+strlen(numCtr)), sizeof(char));
+	strcat(urlStr, urlTemplet);
+	strcat(urlStr, numCtr);
 	flag = http_parse_url(pUrl, host_addr, file, &port);
 	socket_fd = http_tcpclient_create(host_addr, port);
-	flag = http_get_send_content(&pResult, "/group/v226/detail.html?do=Login", vals_message_type, cookesNum);
+	flag = http_get_send_content(&pResult, urlStr, vals_message_type, cookesNum);
 	flag = http_tcpclient_send(socket_fd, pResult);
 	flag = http_tcpclient_recv(socket_fd, lpbuf);
-	http_parse_content(lpbuf, &vals_message_type, &cookesNum, &pHttpContent);
-	flag = http_get_send_content(&pResult, "/group/v226/detail.html?do=ShowLogin", vals_message_type, cookesNum);
-	flag = http_tcpclient_send(socket_fd, pResult);
-	flag = http_tcpclient_recv(socket_fd, lpbuf1);
-	printf("varNum=%d\n", varNum);
+	// http_parse_content(lpbuf, &vals_message_type, &cookesNum, &pHttpContent);
+	// flag = http_get_send_content(&pResult, "/group/v226/detail.html?do=ShowLogin", vals_message_type, cookesNum);
+	// flag = http_tcpclient_send(socket_fd, pResult);
+	// flag = http_tcpclient_recv(socket_fd, lpbuf1);
+	printf("lpbuf=%s\n", lpbuf);
 	close(socket_fd);
-	// printf("lpbuf1=%s\n", lpbuf1);
 }
 
-int readFile(int uids[4])
+int readFile(int uids[UID_NUM])
 {
 	FILE *pFile = NULL;
 	char *pChar = NULL;
@@ -60,34 +67,25 @@ int readFile(int uids[4])
 	}
 	fclose(pFile);
 	return 0;
-
 }
 
 int main()
 {
-	int uids[4];
+	int uids[UID_NUM];
 	readFile(uids);
-
-	int tmpi;
-	for(tmpi = 0; tmpi < 4; tmpi++){
-		printf("uids=%d\n", uids[tmpi]);			
-	}
-	return 0;
-	int totNum = 3;
-	pid_t pid[totNum];
+	pid_t pid[UID_NUM];
 	int i = 0;
-	for (i = 0; i < totNum; i++)
+	for (i = 0; i < UID_NUM; i++)
 	{
 		pid[i] = fork();
 		if (pid[i] == 0)
 		{
-			handle_connect(i);
+			handle_connect(uids[i]);
 		}
 		else
 		{
 			break;
 		}
 	}
-
 	return 1;
 }
