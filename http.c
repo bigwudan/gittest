@@ -25,7 +25,6 @@ static int getCooketData(char **res_p, const char *htmlStr, const char *searchSt
 //组织发送内容头文件
 int http_get_send_content(char **pResult, const char *url, key_value *cookes,  int cookesNum)
 {
-    free(*pResult);
     char *cookStr = NULL;
     if (cookes != NULL)
     {
