@@ -34,7 +34,7 @@ void handle_connect(varNum)
 	// printf("lpbuf1=%s\n", lpbuf1);
 }
 
-int readFile()
+int readFile(int uids[4])
 {
 	FILE *pFile = NULL;
 	char *pChar = NULL;
@@ -42,48 +42,21 @@ int readFile()
 	char uidList[10]; 
 	int num = 0; 
 	int count = 0;
-	int uids[4000];
 	pFile = fopen("uidconfig.txt", "r");
 	if(pFile == NULL){
 		return -1;
 	}else{
-
 		while(fgets(uidList, sizeof(uidList), pFile) != NULL){
-			
 			pChar = strchr(uidList, ',');
 			num = pChar - uidList;
 			pStr = (char *)malloc(sizeof(char)*num);
 			strncpy(pStr, uidList, num);
 			num = atoi(pStr);
 			uids[count] = num;
-			printf("uids[]=%d\n", uids[count]);
 			free(pStr);
 			pStr = NULL;
 			count++;
 		}
-		// char *pTemp = NULL;
-		// pTemp = fgets(uidList, sizeof(uidList), pFile);
-
-		// int yom = strlen(pTemp);
-
-		// printf("yom=%d\n", yom);
-		// printf("uid=%s\n", uidList);
-		// fgets(uidList, sizeof(uidList), pFile);
-
-		// printf("uid=%s\n", uidList);
-		// fgets(uidList, sizeof(uidList), pFile);
-		// printf("uid=%s\n", uidList);
-		// fgets(uidList, sizeof(uidList), pFile);
-		// printf("uid=%s\n", uidList);
-		
-
-		// pTemp = fgets(uidList, sizeof(uidList), pFile);
-
-		
-		// // int tmp = feof(pFile);
-		// pTemp = fgets(uidList, sizeof(uidList), pFile);
-		// printf("tmp1=%s\n", pTemp);
-		
 	}
 	fclose(pFile);
 	return 0;
@@ -92,7 +65,13 @@ int readFile()
 
 int main()
 {
-	readFile();
+	int uids[4];
+	readFile(uids);
+
+	int tmpi;
+	for(tmpi = 0; tmpi < 4; tmpi++){
+		printf("uids=%d\n", uids[tmpi]);			
+	}
 	return 0;
 	int totNum = 3;
 	pid_t pid[totNum];
