@@ -60,9 +60,6 @@ int http_get_send_content(char **pResult, const char *url, key_value *cookes,  i
     }
     free(cookStr);
     cookStr = NULL;
-    free(cookes);
-    cookes = NULL;
-    cookesNum = 0;
     strcat(*pResult, "\r\n\r\n");
     return 1;
 }
