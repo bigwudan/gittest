@@ -34,16 +34,14 @@ int handle_connect(varNum)
 	flag = http_tcpclient_send(socket_fd, pResult);
 	flag = http_tcpclient_recv(socket_fd, lpbuf);
 	http_parse_content(lpbuf, &vals_message_type, &cookesNum, &pHttpContent);
-	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=CheckState&tid=1611", vals_message_type, cookesNum);
+	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=ShowLogin", vals_message_type, cookesNum);
 	flag = http_tcpclient_send(socket_fd, pResult);
 	flag = http_tcpclient_recv(socket_fd, lpbuf1);
 
 
-	// flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=Pay&adid=1&tid=1611", vals_message_type, cookesNum);
-	// flag = http_tcpclient_send(socket_fd, pResult);
-	// flag = http_tcpclient_recv(socket_fd, lpbuf1);	
+	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=CheckState&tid=1611", vals_message_type, cookesNum);
 
-	printf("lpbuf1=%s\n", lpbuf1);
+	 printf("end\n");
 	close(socket_fd);
 }
 
