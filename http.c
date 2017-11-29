@@ -156,8 +156,6 @@ int http_tcpclient_send(int socket, char *buff)
         }
         sent += tmpres;
     }
-    free(buff);
-    buff = NULL;
     return sent;
 }
 

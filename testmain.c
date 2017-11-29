@@ -32,28 +32,27 @@ int handle_connect(varNum)
 	flag = http_parse_url(pUrl, host_addr, file, &port);
 	socket_fd = http_tcpclient_create(host_addr, port);
 	flag = http_get_send_content(&pResult, urlStr, vals_message_type, cookesNum);
-
-
-
 	flag = http_tcpclient_send(socket_fd, pResult);
+	free(pResult);
+	pResult = NULL;	
 	flag = http_tcpclient_recv(socket_fd, lpbuf);
 
 
 	http_parse_content(lpbuf, &vals_message_type, &cookesNum, &pHttpContent);
-	free(pResult);
-	pResult = NULL;
 	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=CheckState&tid=1611", vals_message_type, cookesNum);
 	flag = http_tcpclient_send(socket_fd, pResult);
+	free(pResult);
+	pResult = NULL;
 	flag = http_tcpclient_recv(socket_fd, lpbuf1);
 
-	// free(pResult);
-	// pResult = NULL;
-	// vals_message_type = NULL;
-	// cookesNum = 0;
-	char *pResult_1 = NULL;
-	flag = http_get_send_content(&pResult_1, "http://wap.dev.epet.com/group/v226/detail.html?do=Pay&adid=1&tid=1611", vals_message_type, cookesNum);
-	flag = http_tcpclient_send(socket_fd, pResult_1);
-	flag = http_tcpclient_recv(socket_fd, lpbuf2);	
+
+	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=Pay&adid=1&tid=1611", vals_message_type, cookesNum);
+	flag = http_tcpclient_send(socket_fd, pResult);
+	free(pResult);
+	pResult = NULL;	
+	flag = http_tcpclient_recv(socket_fd, lpbuf2);
+
+
 	//printf("lpbuf2=%s\n", lpbuf2);
 	close(socket_fd);
 }
