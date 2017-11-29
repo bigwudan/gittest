@@ -15,6 +15,7 @@ int handle_connect(varNum)
 	char lpbuf[BUFFER_SIZE * 4] = {'\0'};
 	char lpbuf1[BUFFER_SIZE * 4] = {'\0'};
 	char lpbuf2[BUFFER_SIZE * 4] = {'\0'};
+	char lpbuf3[BUFFER_SIZE * 4] = {'\0'};
 	char *pUrl = "http://wap.dev.epet.com/group/v226/detail.html?do=Login";
 	char *pHttpContent = NULL;
 	key_value *vals_message_type = NULL;
@@ -37,23 +38,29 @@ int handle_connect(varNum)
 	pResult = NULL;	
 	flag = http_tcpclient_recv(socket_fd, lpbuf);
 
-
+	//加入redies
 	http_parse_content(lpbuf, &vals_message_type, &cookesNum, &pHttpContent);
-	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=CheckState&tid=1611", vals_message_type, cookesNum);
+	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=CheckState&tid=1611&token=20801f6500f52e9c95155a2086ff7cf1", vals_message_type, cookesNum);
 	flag = http_tcpclient_send(socket_fd, pResult);
 	free(pResult);
 	pResult = NULL;
 	flag = http_tcpclient_recv(socket_fd, lpbuf1);
 
-
-	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=Pay&adid=1&tid=1611", vals_message_type, cookesNum);
+	//生成报名记录
+	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=Pay&adid=1&tid=1611&token=20801f6500f52e9c95155a2086ff7cf1", vals_message_type, cookesNum);
 	flag = http_tcpclient_send(socket_fd, pResult);
 	free(pResult);
 	pResult = NULL;	
 	flag = http_tcpclient_recv(socket_fd, lpbuf2);
 
+	//支付成功
+	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=TestPaySuccess&tid=1611", vals_message_type, cookesNum);
+	flag = http_tcpclient_send(socket_fd, pResult);
+	free(pResult);
+	pResult = NULL;	
+	flag = http_tcpclient_recv(socket_fd, lpbuf3);
 
-	//printf("lpbuf2=%s\n", lpbuf2);
+	// printf("lpbuf3=%s\n", lpbuf3);
 	close(socket_fd);
 }
 
@@ -89,6 +96,7 @@ int main()
 {
 	int uids[UID_NUM];
 	readFile(uids);
+
 	pid_t pid[UID_NUM];
 	int i = 0;
 	for (i = 0; i < UID_NUM; i++)
