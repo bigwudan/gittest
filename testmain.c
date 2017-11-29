@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include "http.h"
 #define BUFFER_SIZE 1024
-#define UID_NUM 2
+#define UID_NUM 5000
 
 int handle_connect(varNum)
 {
@@ -89,9 +89,6 @@ int main()
 {
 	int uids[UID_NUM];
 	readFile(uids);
-
-	handle_connect(uids[1]);
-	return 1;
 	pid_t pid[UID_NUM];
 	int i = 0;
 	for (i = 0; i < UID_NUM; i++)
