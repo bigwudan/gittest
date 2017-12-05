@@ -200,3 +200,90 @@ int http_parse_content( char *pContent, key_value **pCookes, int *pCookesNum, ch
     *pHttpContent = strdup(strstr(pContent, "\r\n\r\n") + 8);
     return 1;
 }
+
+/**
+ * 获得数据
+ * 
+ */ 
+int recv_data_base(int socket, char ** lpbuff)
+{
+	int recvNum = 0;
+	int num = 1;
+	*lpbuff = (char *)calloc(RECV_BUFF_SIZE, sizeof(char));
+	while(1){
+		*lpbuff = (char *)realloc(*lpbuff, num*RECV_BUFF_SIZE*sizeof(char)); 
+		char buf[RECV_BUFF_SIZE] = {'\0'};
+		recvNum = recv(socket, buf, RECV_BUFF_SIZE, 0);
+		strcat(*lpbuff, buf);
+		if(recvNum <=0 || recvNum < RECV_BUFF_SIZE ){
+			break;
+		}
+		num++;
+	}
+
+    //chunked
+	if(strstr(*lpbuff, "Transfer-Encoding: chunked") != NULL){
+
+        int buffLen = strlen(*lpbuff);
+        *lpbuff+buffLen;
+        *lpbuff+buffLen-1;
+        *lpbuff+buffLen-2;
+
+        
+        printf("2=%x\n", *(*lpbuff+buffLen-1));
+        printf("3=%x\n", *(*lpbuff+buffLen-2));
+        printf("4=%x\n", *(*lpbuff+buffLen-3));
+        printf("5=%x\n", *(*lpbuff+buffLen-4));
+        printf("6=%x\n", *(*lpbuff+buffLen-5));
+
+        printf("buf=%s\n", *lpbuff);
+
+        return 1;
+
+
+        char *p_isEnd = strstr(*lpbuff, "0\r\n");
+        if(p_isEnd == NULL){
+
+            printf("is NULL\n");      
+            printf("buf = %s\n", p_isEnd);          
+        }else{
+            printf("no NULL\n");              
+            printf("buf = %s\n", p_isEnd);      
+        }
+
+
+
+        return 1;
+		char *pTest = strstr(*lpbuff, "\r\n\r\n");
+		pTest = pTest + strlen("\r\n\r\n");
+		char *pTest2 = strstr(pTest , "\r\n");
+		int testNum = pTest2 - pTest;
+		char chunckContentNum[2] = {'\0'}; 
+		strncpy(chunckContentNum, pTest, 2); //
+		char *pContent = pTest2 + strlen("\r\n");
+		// char *pB = strstr(pContent, "\r\n\r\n");
+
+		char contentList[17] = {'\0'};
+		strncpy(contentList, pContent, 16); //
+		char *pEnd = strstr(pContent, "\r\n");
+
+		if(strlen(pEnd) == 2){
+			char buf1[222] = {'\0'};
+			recvNum = recv(socket, buf1, 222, 0);
+
+			// char buf2[222] = {'\0'};
+			// recvNum = recv(socket, buf2, 222, 0);
+
+			printf("rec1=%x\n", buf1[0]);
+			printf("rec2=%x\n", buf1[1]);
+			printf("rec3=%x\n", buf1[2]);
+			printf("rec4=%x\n", buf1[3]);
+			printf("rec5=%x\n", buf1[4]);
+		}else{
+			printf("rec1=%s\n", pContent);
+		}
+	}else{
+		printf("no chunked\n");
+	}
+	return 1;
+}

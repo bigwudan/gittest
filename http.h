@@ -7,6 +7,9 @@
     "Upgrade-Insecure-Requests: 1\r\n"\
     "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.97 Safari/537.36\r\n"\
     "Accept-Language: zh-CN,zh;q=0.8\r\n"
+
+#define RECV_BUFF_SIZE 1024
+
 typedef struct {  
     char *key;  
     char *value;  
@@ -17,4 +20,7 @@ extern int http_tcpclient_create(const char *host, int port);
 extern int http_tcpclient_send(int socket, char *buff);
 extern int http_tcpclient_recv(int socket,char *lpbuff);
 extern int http_parse_content(char *pContent, key_value **pCookes, int *pCookesNum, char **pHttpContent);
+
+extern int recv_data_base(int socket, char ** lpbuff);
+
 #endif  
