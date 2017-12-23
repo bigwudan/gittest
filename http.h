@@ -18,7 +18,7 @@ extern int http_get_send_content(char **pResult, const char *url, key_value *coo
 extern int http_parse_url(const char *url,char *host,char *file,int *port);
 extern int http_tcpclient_create(const char *host, int port);
 extern int http_tcpclient_send(int socket, char *buff);
-extern int http_tcpclient_recv(int socket,char *lpbuff);
+extern int http_tcpclient_recv(int socket,char **lpbuff);
 extern int http_parse_content(char *pContent, key_value **pCookes, int *pCookesNum, char **pHttpContent);
 
 extern int recv_data_base(int socket, char ** lpbuff);

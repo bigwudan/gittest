@@ -3,16 +3,20 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <assert.h>
 #include "http.h"
 #define BUFFER_SIZE 1024
 #define UID_NUM 5000
 
-int handle_connect(varNum)
+int handle_connect(int varNum)
 {
 	char *pResult = NULL;
 	char host_addr[BUFFER_SIZE] = {'\0'};
 	char file[BUFFER_SIZE] = {'\0'};
-	char lpbuf[BUFFER_SIZE * 4] = {'\0'};
+	// char lpbuf[BUFFER_SIZE * 4] = {'\0'};
+
+	char *lpbuf = calloc(1024, sizeof(char));
+
 	char lpbuf1[BUFFER_SIZE * 4] = {'\0'};
 	char lpbuf2[BUFFER_SIZE * 4] = {'\0'};
 	char lpbuf3[BUFFER_SIZE * 4] = {'\0'};
@@ -39,31 +43,14 @@ int handle_connect(varNum)
 	flag = http_tcpclient_send(socket_fd, pResult);
 	free(pResult);
 	pResult = NULL;	
-	flag = http_tcpclient_recv(socket_fd, lpbuf);
+	flag = http_tcpclient_recv(socket_fd, &lpbuf);
 
-	//加入redies
-	http_parse_content(lpbuf, &vals_message_type, &cookesNum, &pHttpContent);
-	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=CheckState&tid=1611&token=20801f6500f52e9c95155a2086ff7cf1", vals_message_type, cookesNum);
-	flag = http_tcpclient_send(socket_fd, pResult);
-	free(pResult);
-	pResult = NULL;
-	flag = http_tcpclient_recv(socket_fd, lpbuf1);
-	//生成报名记录
-	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=Pay&adid=1&tid=1611&token=20801f6500f52e9c95155a2086ff7cf1", vals_message_type, cookesNum);
-	flag = http_tcpclient_send(socket_fd, pResult);
-	free(pResult);
-	pResult = NULL;	
-	flag = http_tcpclient_recv(socket_fd, lpbuf2);
+	printf("n=%s\n", lpbuf);
+
+	return 1;
 	
-	//支付成功
-	flag = http_get_send_content(&pResult, "http://wap.dev.epet.com/group/v226/detail.html?do=TestPaySuccess&tid=1611", vals_message_type, cookesNum);
-	flag = http_tcpclient_send(socket_fd, pResult);
-	free(pResult);
-	pResult = NULL;	
-	flag = http_tcpclient_recv(socket_fd, lpbuf3);
-
-	printf("lpbuf3xxx=%s\n", lpbuf3);
-	close(socket_fd);
+	
+	return 1;
 }
 
 int readFile(int uids[UID_NUM])
@@ -96,7 +83,6 @@ int readFile(int uids[UID_NUM])
 
 int main()
 {
-
 	handle_connect(1);
 	return 1;
 	int uids[UID_NUM];

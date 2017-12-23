@@ -3,6 +3,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <assert.h>
 #include "http.h"
 
 static int getCooketData(char **res_p, const char *htmlStr, const char *searchStr)
@@ -158,14 +159,55 @@ int http_tcpclient_send(int socket, char *buff)
     }
     return sent;
 }
-
 //获取数据
-int http_tcpclient_recv(int socket, char *lpbuff)
+int http_tcpclient_recv(int socket, char **lpbuff)
 {
     int recvnum = 0;
-    recvnum = recv(socket, lpbuff, 1024 * 4, 0);
-    return recvnum;
+    int count = 0;
+    char tmpRec[1024] = {'\0'};
+    
+    char *new_ptr = NULL;
+    int totRecNum = 0;
+    while(1){
+        memset(tmpRec,0,sizeof(char)*1024);
+        recvnum = recv(socket, tmpRec, 1024, 0);
+        totRecNum += recvnum; 
+        count++;
+        new_ptr = realloc(*lpbuff, 1024*count);
+        if (!new_ptr) {
+            assert(NULL);
+        }
+        *lpbuff = new_ptr;
+        if(count == 1){
+            memmove(*lpbuff, tmpRec, 1024);
+        }else{
+            strcat(*lpbuff, tmpRec);
+        }    
+        if(recvnum < 1024){
+            break;  
+        }
+    }
+    if(strstr(*lpbuff, "Transfer-Encoding: chunked")){
+        if(strstr(*lpbuff, "\r\n0\r\n")){
+             return totRecNum;
+        }else{
+            while(1){
+                recvnum = recv(socket, tmpRec, 1024, 0);
+                totRecNum += recvnum; 
+                count++;
+                new_ptr = realloc(*lpbuff, 1024*count);
+                strcat(*lpbuff, tmpRec);
+                if(strstr(tmpRec, "\r\n0\r\n")){
+                    return totRecNum;
+                }
+            }
+        }
+    }else{
+        return totRecNum;
+    }
+    return totRecNum;
 }
+
 
 //分析数据
 int http_parse_content( char *pContent, key_value **pCookes, int *pCookesNum, char **pHttpContent)

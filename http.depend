@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1510974177 source:/home/wudan/wudan/http/main.c
+	<stdio.h>
+	<stdlib.h>
+	<arpa/inet.h>
+	<netdb.h>
+	<string.h>
+
