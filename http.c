@@ -140,7 +140,8 @@ int http_tcpclient_create(const char *host, int port)
     {
         return -1;
     }
-
+    struct timeval timeout = {3, 0};  
+    setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(struct timeval)); 
     return socket_fd;
 }
 //发送信息
@@ -165,7 +166,58 @@ int http_tcpclient_recv(int socket, char **lpbuff)
     int recvnum = 0;
     int count = 0;
     char tmpRec[1024] = {'\0'};
-    
+    char *new_ptr = NULL;
+    int totRecNum = 0;
+    memset(tmpRec,0,sizeof(char)*1024);
+
+    while(1){
+        count++;
+        recvnum = recv(socket, tmpRec, 1024, 0);
+        
+        if(count == 1){
+            memmove(*lpbuff, tmpRec, recvnum);
+        }else{
+            *lpbuff = realloc(*lpbuff, 1024*count);
+            memmove(*lpbuff + totRecNum, tmpRec, recvnum);
+        }
+        totRecNum += recvnum;
+        if(recvnum < 1024){
+            break;
+        }
+    }
+
+    if(strstr(*lpbuff, "Transfer-Encoding: chunked")){
+        if(strstr(*lpbuff, "\r\n0\r\n")){
+             return totRecNum;
+        }else{
+            while(1){
+                count++;
+                memset(tmpRec,0,sizeof(char)*1024);
+                recvnum = recv(socket, tmpRec, 1024, 0);
+                *lpbuff = realloc(*lpbuff, 1024*count);
+                memmove(*lpbuff + totRecNum, tmpRec, recvnum);
+                totRecNum += recvnum;
+                if(strstr(tmpRec, "\r\n0\r\n")){
+                    return totRecNum;
+                }
+            }
+        }
+    }else{
+        return totRecNum;
+    }
+
+
+
+    return totRecNum;
+}
+
+
+//获取数据
+int http_tcpclient_recvbak(int socket, char **lpbuff)
+{
+    int recvnum = 0;
+    int count = 0;
+    char tmpRec[1024] = {'\0'};
     char *new_ptr = NULL;
     int totRecNum = 0;
     while(1){
@@ -187,11 +239,13 @@ int http_tcpclient_recv(int socket, char **lpbuff)
             break;  
         }
     }
+    
     if(strstr(*lpbuff, "Transfer-Encoding: chunked")){
         if(strstr(*lpbuff, "\r\n0\r\n")){
              return totRecNum;
         }else{
             while(1){
+                memset(tmpRec,0,sizeof(char)*1024);
                 recvnum = recv(socket, tmpRec, 1024, 0);
                 totRecNum += recvnum; 
                 count++;

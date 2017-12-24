@@ -6,6 +6,7 @@
 #include <unistd.h> 
 #include <sys/time.h>    // for gettimeofday()
 #include <signal.h>
+#include <assert.h>
 #define BUFFER_SIZE 1024
 #define HTTP_GET "GET /%s HTTP/1.1\r\nHOST: %s:%d\r\nAccept: */*\r\n\r\n"
 #define NUM 10
@@ -57,9 +58,13 @@ int rescu_ParseA(const char *pHtml, char *pRes)
 
 int main()
 {
-    char testList[1024] = {"\0"};
-    rescu_Parse(TEST_HTML, testList);
 
-     printf("%s\n", testList);
+    char *test = "asdasdasdasdasdasdadadas,asdadasdasd,test=12121";
+
+    sscanf();
+
+    printf("test=%s\n", test);
+    printf("ok\n");
+
 
 }
