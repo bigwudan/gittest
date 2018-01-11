@@ -197,7 +197,7 @@ int http_tcpclient_recv(int socket, char **lpbuff)
                 *lpbuff = realloc(*lpbuff, 1024*count);
                 memmove(*lpbuff + totRecNum, tmpRec, recvnum);
                 totRecNum += recvnum;
-                if(strstr(tmpRec, "\r\n0\r\n")){
+                if(strstr(*lpbuff, "\r\n0\r\n")){
                     return totRecNum;
                 }
             }
